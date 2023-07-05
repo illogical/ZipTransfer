@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,18 @@ namespace ZipTransfer.Services
             var messageWithTimestamp = $"{DateTime.Now.ToString(dateFormat)} - {message}";
 
             Console.WriteLine(messageWithTimestamp);
+            // log to a file
+            writer.WriteLine(messageWithTimestamp);
+        }
+
+        /// <summary>
+        /// Only logs to a file. Skips console output.
+        /// </summary>
+        /// <param name="message"></param>
+        public void WriteInfo(string message)
+        {
+            var messageWithTimestamp = $"{DateTime.Now.ToString(dateFormat)} - {message}";
+
             // log to a file
             writer.WriteLine(messageWithTimestamp);
         }
@@ -52,6 +65,8 @@ namespace ZipTransfer.Services
             writer.Flush();
             writer.Close();
         }
+
+        public string FormatStopwatchOutput(Stopwatch sw) => $"{sw.Elapsed.TotalSeconds} seconds";
 
     }
 }

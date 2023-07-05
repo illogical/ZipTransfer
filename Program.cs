@@ -52,7 +52,7 @@ try
     
     stopwatch.Stop();
     Console.WriteLine("");
-    loggerService.WriteLine($"Process complete. Elapsed time: {stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}.{stopwatch.Elapsed.Milliseconds}");
+    loggerService.WriteLine($"Process complete. Elapsed time: {stopwatch.Elapsed.TotalSeconds} seconds");
     Console.WriteLine("Press any key to exit");
     Console.ReadKey();
 }

@@ -12,14 +12,9 @@ namespace ZipTransfer.Services
             _logger = logger;
         }
 
-        public void CreateVersion(Transfer transfer)
+        public void CreateVersion(string sourcePath, string destinationPath, int maxVersionCount)
         {
-            if (!transfer.Versions.HasValue || transfer.Versions == 0)
-            {
-                return;
-            }
-
-            string destinationFilePath = PathHelper.GetDestinationArchiveFilePath(transfer.Source, transfer.Destination);
+            string destinationFilePath = PathHelper.GetDestinationArchiveFilePath(sourcePath, destinationPath);
 
             if(!File.Exists(destinationFilePath))
             {
@@ -27,7 +22,7 @@ namespace ZipTransfer.Services
                 return;
             }
 
-            string versionDirectoryPath = PathHelper.GetDestinationVersionPath(transfer.Destination);
+            string versionDirectoryPath = PathHelper.GetDestinationVersionPath(destinationPath);
 
             if (!Directory.Exists(versionDirectoryPath))
             {
@@ -37,7 +32,7 @@ namespace ZipTransfer.Services
 
             // check if the .zip file count is greater than the number of versions to keep
             var versionFiles = Directory.GetFiles(versionDirectoryPath, "*.zip");
-            string newVersionFilePath = GetNewVersionFilePath(transfer.Destination, transfer.Source);
+            string newVersionFilePath = GetNewVersionFilePath(destinationPath, sourcePath);
 
             if (File.Exists(newVersionFilePath))
             {
@@ -50,7 +45,7 @@ namespace ZipTransfer.Services
             _logger.WriteLine($"Creating version: {newVersionFilePath}");
             File.Copy(destinationFilePath, newVersionFilePath, false);
 
-            if (versionFiles.Length >= transfer.Versions.Value)
+            if (versionFiles.Length >= maxVersionCount)
             {
                 DeleteOldestVersion(versionFiles);
             }
@@ -62,7 +57,7 @@ namespace ZipTransfer.Services
             string destinationFileNameWithoutExtension = Path.GetFileName(sourcePath);
             string formattedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss");
 
-            string newFilePath = Path.Combine(versionDirectoryPath, $"{destinationFileNameWithoutExtension}_{formattedDateTime}.zip");
+            string newFilePath = Path.Combine(versionDirectoryPath, $"{destinationFileNameWithoutExtension}__{formattedDateTime}.zip");
 
             return newFilePath;
         }

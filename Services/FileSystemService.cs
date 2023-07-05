@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace ZipTransfer.Services
 {
@@ -10,31 +11,23 @@ namespace ZipTransfer.Services
             _logger = logger;
         }
 
-        public void MoveArchiveToLocation(string sourceFilePath, string destinationFilePath)
+        public void MoveFileToLocation(string sourceFilePath, string destinationFilePath)
         {
-            FileInfo sourceFile = new FileInfo(sourceFilePath);
-
+            Stopwatch transferTimer = new Stopwatch();
+            transferTimer.Start();
             try
             {
-                sourceFile.CopyTo(destinationFilePath, true);
+                _logger.WriteLine($"Copying file to destination {destinationFilePath}");
+                File.Copy(sourceFilePath, destinationFilePath, true);
+                transferTimer.Stop();
+
+                _logger.WriteLine($"Transfer complete in elapsed time: {_logger.FormatStopwatchOutput(transferTimer)}\n");
             }
             catch (Exception)
             {
                 _logger.WriteError($"Error while copying file to {destinationFilePath}");
                 throw;
             }
-
-            try
-            {
-                _logger.WriteLine("Deleting temporary file...");
-                sourceFile.Delete();
-            }
-            catch (Exception)
-            {
-                _logger.WriteError($"Error while deleting file {sourceFilePath}");
-                throw;
-            }
-            _logger.WriteLine("Transfer complete.");
         }
 
         public void DeleteFilesInPath(string filePath)
@@ -75,15 +68,26 @@ namespace ZipTransfer.Services
 
             try
             {
-                _logger.WriteLine($"{filePath} already exists! Deleting to prepare for replacement...");
+                _logger.WriteInfo($"{filePath} already exists! Deleting to prepare for replacement...");
                 File.Delete(filePath);
-                _logger.WriteLine("Deletion complete.");
+                _logger.WriteInfo("Deletion complete.");
             }
             catch (Exception)
             {
                 _logger.WriteError($"Error while deleting {filePath}");
             }
 
+        }
+
+        public bool ValidatePath(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                _logger.WriteError($"Error: {path} does not exist.");
+                return false;
+            }
+
+            return true;
         }
 
         //https://stackoverflow.com/a/1359947/201115

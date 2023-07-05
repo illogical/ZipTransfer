@@ -1,12 +1,12 @@
-﻿using System.IO.Compression;
+﻿using System.Diagnostics;
+using System.IO.Compression;
+using ZipTransfer.Helpers;
 using ZipTransfer.Models;
 
 namespace ZipTransfer.Services
 {
     public class ZipService
     {
-        // TODO: keep the last x number of zip files with a naming convention. Currently overwrites each time.
-
         private LoggerService _logger;
         private FileSystemService _fileSystem;
         private VersionService _versionService;
@@ -18,7 +18,7 @@ namespace ZipTransfer.Services
             _versionService = versionService;
         }
 
-        public void ZipAndMoveToDestination(string sourcePath, string destinationPath, string tempPath)
+        public void ZipAndMoveToDestination(string sourcePath, string destinationPath, string tempPath, bool deleteSourceFiles = false)
         {
             var archiveFilePath = ZipPath(sourcePath, tempPath); // returns the full path to the new zip file
 
@@ -28,25 +28,17 @@ namespace ZipTransfer.Services
                 return;
             }
 
-            var archiveFileName = new FileInfo(archiveFilePath).Name; // get the file name only to append it to the destinationPath
-            _fileSystem.MoveArchiveToLocation(archiveFilePath, Path.Combine(destinationPath, archiveFileName));
-
-        }
-
-        public void ZipAndDeleteOriginalsAndMoveToDestination(string sourcePath, string destinationPath, string tempPath)
-        {
-            var archiveFilePath = ZipPath(sourcePath, tempPath);
-
-            if (string.IsNullOrWhiteSpace(archiveFilePath))
+            if(deleteSourceFiles)
             {
-                _logger.WriteError($"Unable to create zip file to location: {archiveFilePath}");
-                return;
+                _fileSystem.DeleteFilesInPath(sourcePath);
             }
 
             var archiveFileName = new FileInfo(archiveFilePath).Name; // get the file name only to append it to the destinationPath
-            _fileSystem.DeleteFilesInPath(sourcePath);
-            _fileSystem.MoveArchiveToLocation(archiveFilePath, Path.Combine(destinationPath, archiveFileName));
+            _fileSystem.MoveFileToLocation(archiveFilePath, Path.Combine(destinationPath, archiveFileName));
+            _fileSystem.DeletePathIfExists(archiveFilePath);
+
         }
+
 
         /// <summary>
         /// Uses the source (or subdirectories of the source) to zip each then copy the zip file(s) to the destinationPath.
@@ -64,7 +56,11 @@ namespace ZipTransfer.Services
                     continue;
                 }
 
-                _versionService.CreateVersion(transfer);
+                if (transfer.Versions.HasValue && transfer.Versions > 0)
+                {
+                    _versionService.CreateVersion(transfer.Source, transfer.Destination, transfer.Versions.Value);
+                }
+
 
                 if (transfer.ZipSubdirectories)
                 {
@@ -72,27 +68,12 @@ namespace ZipTransfer.Services
                     foreach (string subDirPath in sourcePaths)
                     {
                         // TODO: delete as a separate pass after all successes?
-                        if (transfer.DeleteAfterArchived)
-                        {
-                            ZipAndDeleteOriginalsAndMoveToDestination(subDirPath, transfer.Destination, tempPath);
-                        }
-                        else
-                        {
-                            ZipAndMoveToDestination(subDirPath, transfer.Destination, tempPath);
-                        }
+                        ZipAndMoveToDestination(subDirPath, transfer.Destination, tempPath, transfer.DeleteAfterArchived);
                     }
                 }
                 else
                 {
-                    if (transfer.DeleteAfterArchived)
-                    {
-                        ZipAndDeleteOriginalsAndMoveToDestination(transfer.Source, transfer.Destination, tempPath);
-                    }
-                    else
-                    {
-                        ZipAndMoveToDestination(transfer.Source, transfer.Destination, tempPath);
-                    }
-
+                    ZipAndMoveToDestination(transfer.Source, transfer.Destination, tempPath, transfer.DeleteAfterArchived);
                 }
             }
         }
@@ -119,27 +100,29 @@ namespace ZipTransfer.Services
             }
         }
 
-        private string? ZipPath(string sourcePath, string tempDestinationPath)
+        private string? ZipPath(string sourcePath, string destinationPath)
         {
-            if (!ValidatePath(sourcePath) || !ValidatePath(tempDestinationPath))
+            if (!_fileSystem.ValidatePath(sourcePath) || !_fileSystem.ValidatePath(destinationPath))
             {
                 return null;
             }
 
+            Stopwatch zipTimer = new Stopwatch();
             _logger.WriteLine($"Zipping {sourcePath}...");
 
             // set destination filename based upon the source folder name
-            var dirInfo = new DirectoryInfo(sourcePath);
-            string sourceFileName = string.Concat(dirInfo.Name, ".zip");
-            string destinationFilePath = Path.Combine(tempDestinationPath, sourceFileName);
+            string destinationFilePath = PathHelper.GetDestinationArchiveFilePath(sourcePath, destinationPath);//Path.Combine(tempDestinationPath, sourceFileName);
 
             // clean up existing Zip file if there was a prior failure
             //_fileSystem.DeleteIfExists(destinationFilePath);
 
             try
             {
+                zipTimer.Start();
                 ZipFile.CreateFromDirectory(sourcePath, destinationFilePath, CompressionLevel.Optimal, false);
-                _logger.WriteLine($"Path successfully zipped to {destinationFilePath}");
+                zipTimer.Stop();
+
+                _logger.WriteLine($"Elapsed time: {_logger.FormatStopwatchOutput(zipTimer)} to zip to path: {destinationFilePath}");
                 return destinationFilePath;
             }
             catch (Exception ex)
@@ -150,17 +133,6 @@ namespace ZipTransfer.Services
         }
 
         
-
-        private bool ValidatePath(string path)
-        {
-            if (!Directory.Exists(path))
-            {
-                _logger.WriteLine($"Error: {path} does not exist.");
-                return false;
-            }
-
-            return true;
-        }
 
     }
 }
