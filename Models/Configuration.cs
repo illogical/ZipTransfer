@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ZipTransfer
+namespace ZipTransfer.Models
 {
     public class Configuration
     {
@@ -16,7 +16,7 @@ namespace ZipTransfer
         /// <summary>
         /// After all zip files are created, move them to their final location
         /// </summary>
-        
+
         public string TempLocation { get; set; }
     }
 }

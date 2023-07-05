@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ZipTransfer
+namespace ZipTransfer.Services
 {
     public class LoggerService
     {
@@ -36,7 +36,7 @@ namespace ZipTransfer
 
         private void StartLog()
         {
-            if(!File.Exists(logFileName))
+            if (!File.Exists(logFileName))
             {
                 // create the first log file
                 File.Create(logFileName);

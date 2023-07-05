@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ZipTransfer.Models;
 
-namespace ZipTransfer
+namespace ZipTransfer.Services
 {
     public class ConfigService
     {
@@ -20,7 +21,7 @@ namespace ZipTransfer
 
         public async Task<Configuration> GetConfiguration()
         {
-            if(_configuration == null)
+            if (_configuration == null)
             {
                 _configuration = await LoadConfiguration();
             }

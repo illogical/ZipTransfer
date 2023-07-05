@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Compression;
+using ZipTransfer.Models;
 
-namespace ZipTransfer
+namespace ZipTransfer.Services
 {
     public class ZipService
     {
@@ -13,7 +14,7 @@ namespace ZipTransfer
 
         public ZipService(LoggerService logger)
         {
-            _logger = logger;   
+            _logger = logger;
             _fileSystem = new FileSystemService(logger);
         }
 
@@ -29,7 +30,7 @@ namespace ZipTransfer
 
             var archiveFileName = new FileInfo(archiveFilePath).Name; // get the file name only to append it to the destinationPath
             _fileSystem.MoveArchiveToLocation(archiveFilePath, Path.Combine(destinationPath, archiveFileName));
-            
+
         }
 
         public void ZipAndDeleteOriginalsAndMoveToDestination(string sourcePath, string destinationPath, string tempPath)
@@ -55,7 +56,7 @@ namespace ZipTransfer
         /// <param name="tempPath">Path to store the zip files prior to moving them to the destination.</param>
         public void ZipConfiguredPathsAndMoveToDestination(List<Transfer> transfers, string tempPath)
         {
-            foreach(var transfer in transfers)
+            foreach (var transfer in transfers)
             {
                 if (!Directory.Exists(transfer.Source))
                 {
@@ -68,7 +69,7 @@ namespace ZipTransfer
                     var sourcePaths = new DirectoryInfo(transfer.Source).GetDirectories().Select(d => d.FullName);
                     foreach (string subDirPath in sourcePaths)
                     {
-                        if(transfer.DeleteAfterArchived)
+                        if (transfer.DeleteAfterArchived)
                         {
                             ZipAndDeleteOriginalsAndMoveToDestination(subDirPath, transfer.Destination, tempPath);
                         }
@@ -80,7 +81,7 @@ namespace ZipTransfer
                 }
                 else
                 {
-                    if(transfer.DeleteAfterArchived)
+                    if (transfer.DeleteAfterArchived)
                     {
                         ZipAndDeleteOriginalsAndMoveToDestination(transfer.Source, transfer.Destination, tempPath);
                     }
@@ -88,9 +89,9 @@ namespace ZipTransfer
                     {
                         ZipAndMoveToDestination(transfer.Source, transfer.Destination, tempPath);
                     }
-                    
+
                 }
-            }            
+            }
         }
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace ZipTransfer
         /// <param name="destinationPath">Location where the Zip files will be moved to.</param>
         public void ZipSubdirectoriesAndMoveToDestination(string sourcePath, string destinationPath, string tempPath)
         {
-            if(!Directory.Exists(sourcePath))
+            if (!Directory.Exists(sourcePath))
             {
                 _logger.WriteError($"Path is not valid: {sourcePath}");
                 return;
@@ -112,7 +113,7 @@ namespace ZipTransfer
             foreach (var subdir in subDirs)
             {
                 ZipAndMoveToDestination(subdir, destinationPath, tempPath);
-            }   
+            }
         }
 
         private string? ZipPath(string sourcePath, string tempDestinationPath)
@@ -147,7 +148,7 @@ namespace ZipTransfer
 
         private bool ValidatePath(string path)
         {
-            if(!Directory.Exists(path))
+            if (!Directory.Exists(path))
             {
                 _logger.WriteLine($"Error: {path} does not exist.");
                 return false;

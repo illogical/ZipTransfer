@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ZipTransfer
+namespace ZipTransfer.Services
 {
     public class FileSystemService
     {
@@ -28,14 +28,6 @@ namespace ZipTransfer
                 _logger.WriteError($"Error while copying file to {destinationFilePath}");
                 throw;
             }
-
-            // This was causing the file deletion to throw an exception because the file was already in use.
-            //_logger.WriteLine("Verifying transfer...");
-            //if (!FilesAreEqual_Hash(sourceFile, new FileInfo(destinationFilePath)))
-            //{
-            //    _logger.WriteError("Error: file hashes do not match! Source file will not be deleted.");
-            //    return;
-            //}
 
             try
             {
@@ -61,7 +53,7 @@ namespace ZipTransfer
             {
                 _logger.WriteLine($"Deleting all files/directories in path: {filePath}...");
 
-                foreach(var file in Directory.GetFiles(filePath))
+                foreach (var file in Directory.GetFiles(filePath))
                 {
                     File.Delete(file);
                 }
@@ -81,7 +73,7 @@ namespace ZipTransfer
 
         public void DeletePathIfExists(string filePath)
         {
-            if(!File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
                 return;
             }
@@ -96,7 +88,7 @@ namespace ZipTransfer
             {
                 _logger.WriteError($"Error while deleting {filePath}");
             }
-            
+
         }
 
         //https://stackoverflow.com/a/1359947/201115
@@ -105,7 +97,7 @@ namespace ZipTransfer
             byte[] firstHash = MD5.Create().ComputeHash(first.OpenRead());
             byte[] secondHash = MD5.Create().ComputeHash(second.OpenRead());
 
-            for (int i = 0; i<firstHash.Length; i++)
+            for (int i = 0; i < firstHash.Length; i++)
             {
                 if (firstHash[i] != secondHash[i])
                     return false;

@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Diagnostics;
-using ZipTransfer;
+using ZipTransfer.Services;
 
 Console.WriteLine("ZipTransfer");
 Console.WriteLine(string.Empty);
