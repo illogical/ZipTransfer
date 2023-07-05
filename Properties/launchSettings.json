@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ZipTransfer": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\temp\\TestZipping"
+    }
+  }
+}

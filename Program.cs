@@ -1,0 +1,60 @@
+﻿// See https://aka.ms/new-console-template for more information
+
+using System.Diagnostics;
+using ZipTransfer;
+
+Console.WriteLine("ZipTransfer");
+Console.WriteLine(string.Empty);
+
+//  use a json config file
+// zip folders
+var loggerService = new LoggerService();
+var stopwatch = new Stopwatch();
+stopwatch.Start();
+
+try
+{
+    // minimal assistance
+    if (args.Length > 0 && (args[0] == "-?" || args[0] == "-help" || args[0] == "?" || args[0] == "help"))
+    {
+        Console.WriteLine(string.Empty);
+        Console.WriteLine("Pass a path as the first parameter to zip each of its subdirectories and transfer those zip files to a path passed as the second parameter.");
+        Console.WriteLine("If paths are not passed as arguments then the Configuration.json provides the sources to zip and the zip files' destination.");
+        Console.WriteLine(string.Empty);
+        Console.WriteLine("Press any key to exit");
+        Console.ReadKey();
+        return;
+    }
+
+    var zipService = new ZipService(loggerService);
+    var configService = new ConfigService(loggerService);
+    var configuration = await configService.GetConfiguration();
+
+    if (args.Length >= 2)
+    {
+        // if a folder was provided then zip all of its subdirectories into separate zip files
+        // the provided directory is also where the zip files will be created before being moved to the destination.
+        zipService.ZipSubdirectoriesAndMoveToDestination(args[0], args[1], args[0]);
+    }
+    else if (args.Length == 0)
+    {
+        // use the configuration file to determine which directories to zip
+        zipService.ZipConfiguredPathsAndMoveToDestination(configuration.Transfers, configuration.TempLocation);
+    }
+    else
+    {
+        loggerService.WriteError("I'm not sure what you are trying to accomplish.");
+        return;
+    }
+    
+    stopwatch.Stop();
+    Console.WriteLine("");
+    loggerService.WriteLine($"Process complete. Elapsed time: {stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}.{stopwatch.Elapsed.Milliseconds}");
+    Console.WriteLine("Press any key to exit");
+    Console.ReadKey();
+}
+finally
+{
+    loggerService.EndLog();
+}
+
