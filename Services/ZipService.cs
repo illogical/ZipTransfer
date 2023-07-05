@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using ZipTransfer.Models;
 
 namespace ZipTransfer.Services
@@ -11,11 +9,13 @@ namespace ZipTransfer.Services
 
         private LoggerService _logger;
         private FileSystemService _fileSystem;
+        private VersionService _versionService;
 
-        public ZipService(LoggerService logger)
+        public ZipService(LoggerService logger, VersionService versionService)
         {
             _logger = logger;
             _fileSystem = new FileSystemService(logger);
+            _versionService = versionService;
         }
 
         public void ZipAndMoveToDestination(string sourcePath, string destinationPath, string tempPath)
@@ -64,11 +64,14 @@ namespace ZipTransfer.Services
                     continue;
                 }
 
+                _versionService.CreateVersion(transfer);
+
                 if (transfer.ZipSubdirectories)
                 {
                     var sourcePaths = new DirectoryInfo(transfer.Source).GetDirectories().Select(d => d.FullName);
                     foreach (string subDirPath in sourcePaths)
                     {
+                        // TODO: delete as a separate pass after all successes?
                         if (transfer.DeleteAfterArchived)
                         {
                             ZipAndDeleteOriginalsAndMoveToDestination(subDirPath, transfer.Destination, tempPath);
@@ -145,6 +148,8 @@ namespace ZipTransfer.Services
                 return null;
             }
         }
+
+        
 
         private bool ValidatePath(string path)
         {

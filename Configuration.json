@@ -1,20 +1,11 @@
 {
-  "Transfers": [
-    {
-      "Source": "/Users/matt/My Files/Unity/My Projects",
-      "Destination": "/Users/matt/My Files/Unity Transfer/My Projects",
-      "ZipSubdirectories": true
-    },
-    {
-      "Source": "/Users/matt/My Files/Unity/My Samples",
-      "Destination": "/Users/matt/My Files/Unity Transfer/My Samples",
-      "ZipSubdirectories": true
-    },
-    {
-      "Source": "/Users/matt/My Files/Unity/Following Tutorials",
-      "Destination": "/Users/matt/My Files/Unity Transfer/Following Tutorials",
-      "ZipSubdirectories": true
-    }
-  ],
-  "TempLocation": "/Users/matt/My Files/Unity Transfer"
+    "Transfers": [
+        {
+            "Source": "C:\\temp\\TestTransfers\\source",
+            "Destination": "C:\\temp\\TestTransfers\\destination",
+            "ZipSubdirectories": false,
+            "Versions": 2
+        }
+    ],
+    "TempLocation": "C:\\temp\\TestTransfers\\temp"
 }

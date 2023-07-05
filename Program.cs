@@ -10,7 +10,6 @@ Console.WriteLine(string.Empty);
 // zip folders
 var loggerService = new LoggerService();
 var stopwatch = new Stopwatch();
-stopwatch.Start();
 
 try
 {
@@ -26,14 +25,18 @@ try
         return;
     }
 
-    var zipService = new ZipService(loggerService);
+    var versionService = new VersionService(loggerService);
+    var zipService = new ZipService(loggerService, versionService);
     var configService = new ConfigService(loggerService);
     var configuration = await configService.GetConfiguration();
+
+    stopwatch.Start();
 
     if (args.Length >= 2)
     {
         // if a folder was provided then zip all of its subdirectories into separate zip files
         // the provided directory is also where the zip files will be created before being moved to the destination.
+        // TODO: support for versioning the zip files
         zipService.ZipSubdirectoriesAndMoveToDestination(args[0], args[1], args[0]);
     }
     else if (args.Length == 0)

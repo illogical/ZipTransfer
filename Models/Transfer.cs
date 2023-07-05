@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace ZipTransfer.Models
 {
     public class Transfer
@@ -13,7 +8,8 @@ namespace ZipTransfer.Models
         /// <summary>
         /// When true, zip each subdirectory as a separate Zip file. When false, zip this directory as a single Zip file.
         /// </summary>
-        public bool ZipSubdirectories { get; set; }
+        public bool ZipSubdirectories { get; set; }     // true if each subdirectory should be zipped separately
         public bool DeleteAfterArchived { get; set; }   // Useful for archiving in-place
+        public int? Versions { get; set; }
     }
 }
