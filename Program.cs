@@ -42,7 +42,10 @@ try
         // TODO: support for versioning the zip files
         argService.ParseArgs(args);
 
-        zipService.ZipSubdirectoriesAndMoveToDestination(argService.GetArgValueByTitle("source"), argService.GetArgValueByTitle("destination"), argService.GetArgValueByTitle("temp"));
+        int versions = 0;
+        int.TryParse(argService.GetArgValueByTitle("versions"), out versions);
+
+        zipService.ZipSubdirectoriesAndMoveToDestination(argService.GetArgValueByTitle("source"), argService.GetArgValueByTitle("destination"), argService.GetArgValueByTitle("temp"), versions);
 
         //-s "C:\temp\TestTransfers\source" -d "C:\temp\TestTransfers\destination" -t "C:\temp\TestTransfers\temp"
     }

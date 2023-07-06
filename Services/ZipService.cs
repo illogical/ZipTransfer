@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO.Compression;
 using ZipTransfer.Helpers;
 using ZipTransfer.Models;
@@ -83,12 +84,19 @@ namespace ZipTransfer.Services
         /// </summary>
         /// <param name="sourcePath">Parent directory. All of its child folders will become a Zip archive.</param>
         /// <param name="destinationPath">Location where the Zip files will be moved to.</param>
-        public void ZipSubdirectoriesAndMoveToDestination(string sourcePath, string destinationPath, string tempPath)
+        /// /// <param name="tempPath">Location where the Zip files will be created.</param>
+        /// /// <param name="versions">Max number of versions to store.</param>
+        public void ZipSubdirectoriesAndMoveToDestination(string sourcePath, string destinationPath, string tempPath, int maxVersions = 0)
         {
             if (!Directory.Exists(sourcePath))
             {
                 _logger.WriteError($"Path is not valid: {sourcePath}");
                 return;
+            }
+
+            if (maxVersions > 0)
+            {
+                _versionService.CreateVersion(sourcePath, destinationPath, maxVersions);
             }
 
             var dirInfo = new DirectoryInfo(sourcePath);
