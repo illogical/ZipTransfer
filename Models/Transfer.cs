@@ -11,5 +11,14 @@ namespace ZipTransfer.Models
         public bool ZipSubdirectories { get; set; }     // true if each subdirectory should be zipped separately
         public bool DeleteAfterArchived { get; set; }   // Useful for archiving in-place
         public int? Versions { get; set; }
+
+        public Transfer(string source, string destination, bool zipSubDirectories = false, bool deleteAfterArchived = false, int? versions = null)
+        {
+            Source = source;
+            Destination = destination;
+            ZipSubdirectories = zipSubDirectories;
+            DeleteAfterArchived = deleteAfterArchived;
+            Versions = versions;
+        }
     }
 }

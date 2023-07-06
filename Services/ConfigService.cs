@@ -37,6 +37,15 @@ namespace ZipTransfer.Services
             }
         }
 
+        public void AddNewTransfer(Transfer transfer)
+        {
+            _configuration.Transfers.Add(transfer);
+
+            string jsonString = JsonSerializer.Serialize(_configuration);
+            string fileName = _configurationFileName;
+            File.WriteAllText(fileName, jsonString);
+        }
+
         public static class JsonFileReader
         {
             public static async Task<T> ReadAsync<T>(string filePath)

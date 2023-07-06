@@ -119,7 +119,7 @@ namespace ZipTransfer.Services
             try
             {
                 zipTimer.Start();
-                ZipFile.CreateFromDirectory(sourcePath, destinationFilePath, CompressionLevel.Optimal, false);
+                ZipFile.CreateFromDirectory(sourcePath, destinationFilePath, CompressionLevel.Fastest, false);
                 zipTimer.Stop();
 
                 _logger.WriteLine($"Elapsed time: {_logger.FormatStopwatchOutput(zipTimer)} to zip to path: {destinationFilePath}");

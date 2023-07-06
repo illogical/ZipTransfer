@@ -26,3 +26,6 @@ ZipTransfer.exe <source> <destination> <tempPath>
     "TempLocation": "C:\\temp"
 }
 ```
+#### Compression Benchmark
+* Sample using optimal compression took 85.23 seconds to zip to 159MB.
+* Sample using fastest compression took 4.72 seconds to zip to 169MB.
