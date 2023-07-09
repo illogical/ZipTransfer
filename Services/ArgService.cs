@@ -32,6 +32,7 @@ namespace ZipTransfer.Services
             availableArgs.Add(new ArgOption("s", "source", "Source path", true));
             availableArgs.Add(new ArgOption("d", "destination", "Destination path", true));
             availableArgs.Add(new ArgOption("t", "temp", "Temp path", true));
+            availableArgs.Add(new ArgOption("c", "configuration", "Configuration json file path", true));
             availableArgs.Add(new ArgOption("v", "versions", "(Optional) Max number of versions"));
             availableArgs.Add(new ArgOption("da", "delete-after", "(Optional) Delete source files after zip successfully transfers"));
             availableArgs.Add(new ArgOption("zs", "zip-subdirectories", "(Optional) Max number of versions"));

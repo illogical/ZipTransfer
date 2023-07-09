@@ -42,10 +42,22 @@ try
         // TODO: support for versioning the zip files
         argService.ParseArgs(args);
 
-        int versions = 0;
-        int.TryParse(argService.GetArgValueByTitle("versions"), out versions);
+        // TODO: check if a configuration file is provided
+        var configurationPath = argService.GetArgValueByTitle("configuration");
+        if(configurationPath != null)
+        {
+            configuration = await configService.GetConfiguration(configurationPath);
+            zipService.ZipConfiguredPathsAndMoveToDestination(configuration.Transfers, configuration.TempLocation);
+        }
+        else
+        {
+            int versions = 0;
+            int.TryParse(argService.GetArgValueByTitle("versions"), out versions);
 
-        zipService.ZipSubdirectoriesAndMoveToDestination(argService.GetArgValueByTitle("source"), argService.GetArgValueByTitle("destination"), argService.GetArgValueByTitle("temp"), versions);
+            zipService.ZipSubdirectoriesAndMoveToDestination(argService.GetArgValueByTitle("source"), argService.GetArgValueByTitle("destination"), argService.GetArgValueByTitle("temp"), versions);
+
+        }
+
 
         //-s "C:\temp\TestTransfers\source" -d "C:\temp\TestTransfers\destination" -t "C:\temp\TestTransfers\temp"
     }

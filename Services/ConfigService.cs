@@ -23,6 +23,21 @@ namespace ZipTransfer.Services
             return _configuration;
         }
 
+        public async Task<Configuration> GetConfiguration(string configurationPath)
+        {
+            if (File.Exists(configurationPath))
+            {
+                _configuration = await LoadConfiguration(configurationPath);
+            }
+            else
+            {
+                string errormessage = $"Error: {configurationPath} does not exist";
+                _logger.WriteError(errormessage);
+                throw new Exception(errormessage);
+            }
+            return _configuration;
+        }
+
         private async Task<Configuration> LoadConfiguration()
         {
             try
@@ -33,6 +48,20 @@ namespace ZipTransfer.Services
             catch (Exception ex)
             {
                 _logger.WriteError($"Error loading configuration file: {_configurationFileName}");
+                throw;
+            }
+        }
+
+        private async Task<Configuration> LoadConfiguration(string configurationPath)
+        {
+            try
+            {
+                Configuration config = await JsonFileReader.ReadAsync<Configuration>(configurationPath);
+                return config;
+            }
+            catch (Exception ex)
+            {
+                _logger.WriteError($"Error loading configuration file: {configurationPath}");
                 throw;
             }
         }
