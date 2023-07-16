@@ -35,7 +35,7 @@ namespace ZipTransfer.Services
             availableArgs.Add(new ArgOption("c", "configuration", "Configuration json file path", true));
             availableArgs.Add(new ArgOption("v", "versions", "(Optional) Max number of versions"));
             availableArgs.Add(new ArgOption("da", "delete-after", "(Optional) Delete source files after zip successfully transfers"));
-            availableArgs.Add(new ArgOption("zs", "zip-subdirectories", "(Optional) Max number of versions"));
+            availableArgs.Add(new ArgOption("zs", "zip-subdirectories", "(Optional) Zip each subdirectory found in the source path"));
         }
 
         public string GetHelpText()
@@ -56,6 +56,7 @@ namespace ZipTransfer.Services
 
             return sb.ToString();
         }
+
         public string? GetArgValue(string argOption)
         {
             return parsedArgs[argOption];
@@ -63,7 +64,7 @@ namespace ZipTransfer.Services
 
         public string? GetArgValueByTitle(string argTitle)
         {
-            var matchedArg = availableArgs.FirstOrDefault(a => a.Title == argTitle);
+            var matchedArg = availableArgs.FirstOrDefault(a => a.Title.Equals(argTitle, StringComparison.CurrentCultureIgnoreCase));
             if(matchedArg == null || !parsedArgs.ContainsKey(matchedArg.Option))
             {
                 throw new Exception($"Arg with title {argTitle} not found");
@@ -123,16 +124,6 @@ namespace ZipTransfer.Services
             //GetArgOptionByOption(argOption).Validate();
 
             parsedArgs[argOption.ToLower()] = value;
-        }
-
-        //private ArgOption? GetArgOptionByTitle(string title)
-        //{
-        //    return availableArgs.FirstOrDefault(a => a.Title == title);
-        //}
-
-        private ArgOption? GetArgOptionByOption(string option)
-        {
-            return availableArgs.FirstOrDefault(a => a.Option == option);
         }
     }
 }

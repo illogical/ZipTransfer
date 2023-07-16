@@ -86,7 +86,7 @@ namespace ZipTransfer.Services
         /// <param name="destinationPath">Location where the Zip files will be moved to.</param>
         /// /// <param name="tempPath">Location where the Zip files will be created.</param>
         /// /// <param name="versions">Max number of versions to store.</param>
-        public void ZipSubdirectoriesAndMoveToDestination(string sourcePath, string destinationPath, string tempPath, int maxVersions = 0)
+        public void ZipSubdirectoriesAndMoveToDestination(string sourcePath, string destinationPath, string tempPath, int maxVersions = 0, bool zipSubdirectories = false)
         {
             if (!Directory.Exists(sourcePath))
             {
@@ -100,12 +100,22 @@ namespace ZipTransfer.Services
             }
 
             var dirInfo = new DirectoryInfo(sourcePath);
-            var subDirs = dirInfo.GetDirectories().Select(d => d.FullName);
 
-            foreach (var subdir in subDirs)
+            if(zipSubdirectories)
             {
-                ZipAndMoveToDestination(subdir, destinationPath, tempPath);
+                var subDirs = dirInfo.GetDirectories().Select(d => d.FullName);
+
+                foreach (var subdir in subDirs)
+                {
+                    ZipAndMoveToDestination(subdir, destinationPath, tempPath);
+                }
             }
+            else
+            {
+                ZipAndMoveToDestination(sourcePath, destinationPath, tempPath);
+            }
+
+            
         }
 
         private string? ZipPath(string sourcePath, string destinationPath)
